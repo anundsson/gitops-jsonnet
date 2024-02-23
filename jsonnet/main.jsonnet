@@ -1,12 +1,8 @@
-// Import generated configuration that includes all tenant configs
-local tenantConfigs = import 'tenantConfigs.jsonnet';
+local exampleTenant = import './roles/example_tenant.jsonnet';
+local tenantAConfig = import './tenants/tenant_a.jsonnet';
+local tenantBConfig = import './tenants/tenant_b.jsonnet';
 
-// Aggregate resources from all tenants
-local aggregatedResources = std.flattenArrays(tenantConfigs.configs);
-
-// Output the aggregated resources, structured for YAML conversion
 {
-  apiVersion: 'v1',
-  kind: 'List',
-  items: aggregatedResources,
+  "tenantA": exampleTenant.generate(tenantAConfig),
+  "tenantB": exampleTenant.generate(tenantBConfig),
 }
