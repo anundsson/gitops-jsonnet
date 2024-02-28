@@ -6,8 +6,7 @@ local roleLib = import '../modules/role.jsonnet';
 local rolebindingLib = import '../modules/rolebinding.jsonnet';
 
 {
-  generate(config):: {  // Use `::` to define a hidden field if you don't want it to appear in the output
-    // Correctly define local variables within the function
+  generate(config):: {
     local namespace = config.tenantName,
     local serviceAccountName = config.tenantName + config.serviceAccountSuffix,
 
