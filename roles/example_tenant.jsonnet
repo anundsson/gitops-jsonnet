@@ -1,3 +1,4 @@
+// Import necessary libraries
 local namespaceLib = import '../modules/namespace.jsonnet';
 local appProjectLib = import '../modules/appproject.jsonnet';
 local applicationLib = import '../modules/application.jsonnet';
@@ -5,13 +6,14 @@ local applicationSetLib = import '../modules/applicationset.jsonnet';
 local roleLib = import '../modules/role.jsonnet';
 local rolebindingLib = import '../modules/rolebinding.jsonnet';
 
+// Define the generate function
 {
-  generate(config):: {  // Use `::` to define a hidden field if you don't want it to appear in the output
-    // Correctly define local variables within the function
+  generate(config):: {
+    // Define local variables within the function
     local namespace = config.tenantName,
     local serviceAccountName = config.tenantName + config.serviceAccountSuffix,
 
-    // The resources array includes calls to the module functions, passing necessary parameters
+    // Define the resources
     resources: [
       namespaceLib.Namespace(namespace),
       appProjectLib.AppProject(namespace + '-project', namespace),
