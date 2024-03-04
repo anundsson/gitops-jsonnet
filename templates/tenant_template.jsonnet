@@ -1,21 +1,23 @@
-// tenants/template/tenant_template.jsonnet
-
-local namespace = import '../modules/namespace.jsonnet';
-local role = import '../modules/role.jsonnet';
-local rolebinding = import '../modules/rolebinding.jsonnet';
-
-// Define the function to accept a single object parameter
+// Adjusted tenant_template.jsonnet to ensure correct output format
 function(params) {
-  // Destructure params to extract individual parameters
-  local tenantName = params.tenantName,
-  local namespaceName = params.namespaceName,
-  local rolesBindings = params.rolesBindings,
+  local application = import '../modules/application.jsonnet';
+  local namespace = import '../modules/namespace.jsonnet';
+  local role = import '../modules/role.jsonnet';
+  local rolebinding = import '../modules/rolebinding.jsonnet';
 
-  items: [
-    namespace.Namespace(namespaceName),
-  ] + [
-    role.Role(rb.roleName, namespaceName, rb.verbs, rb.apiGroups, rb.resources) for rb in rolesBindings
-  ] + [
-    rolebinding.RoleBinding(rb.bindingName, rb.roleName, namespaceName, rb.serviceAccountName) for rb in rolesBindings
-  ],
+  {
+    apiVersion: 'v1',
+    kind: 'List',
+    items: [
+      namespace.Namespace(params.namespaceName),
+      // Assuming application parameters are optional; adjust logic as needed
+      if params.project != null && params.repoURL != null && params.path != null && params.targetRevision != null then
+        application.Application(params.tenantName, params.namespaceName, params.project, params.repoURL, params.path, params.targetRevision)
+      else null,
+    ] + [
+      role.Role(rb.roleName, params.namespaceName, rb.verbs, rb.apiGroups, rb.resources) for rb in params.rolesBindings
+    ] + [
+      rolebinding.RoleBinding(rb.bindingName, rb.roleName, params.namespaceName, rb.serviceAccountName) for rb in params.rolesBindings
+    ],
+  }
 }
