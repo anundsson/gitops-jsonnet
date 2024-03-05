@@ -1,20 +1,27 @@
-// Assuming this file is in a directory that has `template` as a sibling directory
-local tenantTemplate = import '../templates/tenant_template.jsonnet';
+// Import the modules
+local namespaceMod = import '../modules/namespace.jsonnet';
+local roleMod = import '../modules/role.jsonnet';
+local roleBindingMod = import '../modules/rolebinding.jsonnet';
 
-tenantTemplate({
-  tenantName: 'tenant-a-app',
-  namespaceName: 'tenant-a-namespace',
-  rolesBindings: [
-    {
-      roleName: 'tenant-a-role',
-      verbs: ['get', 'watch', 'list'],
-      apiGroups: ['', 'extensions', 'apps'],
-      resources: ['deployments', 'pods'],
-      bindingName: 'tenant-a-rolebinding',
-      serviceAccountName: 'tenant-a-serviceaccount',
-    },
-    // Additional roles and bindings can be defined in the same manner
-  ],
-  // Optional application parameters can be included or omitted
-  // Ensure these are either all provided or handled as optional within the template
-})
+// Define the tenant's namespace, roles, and role bindings using the modules
+local tenantNamespace = namespaceMod.Namespace('tenant-a-namespace');
+local tenantRole = roleMod.Role(
+  'tenant-a-role', 
+  'tenant-a-namespace', 
+  ['get', 'list', 'watch'], 
+  [''], 
+  ['pods', 'deployments']
+);
+local tenantRoleBinding = roleBindingMod.RoleBinding(
+  'tenant-a-rolebinding', 
+  'tenant-a-role', 
+  'tenant-a-namespace', 
+  'tenant-a-serviceaccount'
+);
+
+// Combine all the resources into a list for output
+[
+  tenantNamespace,
+  tenantRole,
+  tenantRoleBinding,
+]
