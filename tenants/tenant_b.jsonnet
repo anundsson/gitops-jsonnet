@@ -1,23 +1,27 @@
-{
-  tenantName: 'b-tenant',
-  serviceAccountSuffix: '-svc',
-  role: 'platform-reader',
-  extraRole: 'platform-writer',
-  repoUrl: 'https://b.com/repo.git',
-  appPath: 'path/to/b/application',
-  targetRevision: 'HEAD',
-  applicationSet: [
-    {
-      name: 'b-app1',
-      namespace: 'b-tenant',
-      path: 'apps/b-app1',
-      targetRevision: 'HEAD',
-    },
-    {
-      name: 'b-app2',
-      namespace: 'b-tenant',
-      path: 'apps/b-app2',
-      targetRevision: 'HEAD',
-    },
-  ],
-}
+// Import the modules
+local namespaceMod = import '../modules/namespace.jsonnet';
+local roleMod = import '../modules/role.jsonnet';
+local roleBindingMod = import '../modules/rolebinding.jsonnet';
+
+// Define the tenant's namespace, roles, and role bindings using the modules
+local tenantNamespace = namespaceMod.Namespace('tenant-b-namespace');
+local tenantRole = roleMod.Role(
+  'tenant-b-role', 
+  'tenant-b-namespace', 
+  ['get', 'list', 'watch'], 
+  [''], 
+  ['pods', 'deployments']
+);
+local tenantRoleBinding = roleBindingMod.RoleBinding(
+  'tenant-b-rolebinding', 
+  'tenant-b-role', 
+  'tenant-b-namespace', 
+  'tenant-b-serviceaccount'
+);
+
+// Combine all the resources into a list for output
+[
+  tenantNamespace,
+  tenantRole,
+  tenantRoleBinding,
+]
