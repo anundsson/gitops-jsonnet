@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: tenant-applications
+  namespace: argocd
+spec:
+  generators:
+    - list:
+        elements:
+          - name: tenantA
+            path: tenants/tenant_a/
+          - name: tenantB
+            path: tenants/tenant_b/
+  template:
+    metadata:
+      name: '{{name}}-application'
+    spec:
+      project: default
+      source:
+        repoURL: 'https://github.com/anundsson/gitops-jsonnet.git'
+        targetRevision: HEAD
+        path: '{{path}}'
+      destination:
+        server: 'https://kubernetes.default.svc'
+        namespace: '{{name}}-namespace'
+      syncPolicy:
+        automated:
+          selfHeal: true
+          prune: true
